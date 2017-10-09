@@ -32,5 +32,7 @@ public class DeletePesertaCsvTasklet implements Tasklet{
             logger.error("UNABLE TO DELETE FILE !!");
         }
         return RepeatStatus.FINISHED;
+
+//        throw new Exception("SENGAJA DIBUAT ERROR !!");
     }   
 }
