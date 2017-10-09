@@ -33,7 +33,6 @@ public class PesertaItemwritter implements ItemWriter<Peserta>{
             pesertaDao.save(peserta);
               
         }
-
     }
     
 }
