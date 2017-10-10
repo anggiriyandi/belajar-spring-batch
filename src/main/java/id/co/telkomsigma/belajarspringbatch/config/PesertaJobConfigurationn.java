@@ -6,6 +6,7 @@
 package id.co.telkomsigma.belajarspringbatch.config;
 
 import id.co.telkomsigma.belajarspringbatch.domain.Peserta;
+import id.co.telkomsigma.belajarspringbatch.listener.ItemReaderListener;
 import id.co.telkomsigma.belajarspringbatch.listener.SkipCheckingListener;
 import id.co.telkomsigma.belajarspringbatch.mapper.PesertaMapper;
 import id.co.telkomsigma.belajarspringbatch.processor.PesertaItemProcessor;
@@ -50,6 +51,9 @@ public class PesertaJobConfigurationn {
     
     @Autowired
     public SkipCheckingListener skipCheckingListener;
+    
+    @Autowired
+    public ItemReaderListener readerListener;
     
             
     @Bean
@@ -98,6 +102,7 @@ public class PesertaJobConfigurationn {
                     .skip(FlatFileParseException.class)
                     .skipLimit(1)
                 .listener(skipCheckingListener)
+                .listener(readerListener)
                 .build();
     } 
     
