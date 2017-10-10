@@ -12,6 +12,7 @@ import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -27,7 +28,12 @@ public class PesertaBatchJobController {
     private JobLauncher jobLauncher;
     
     @Autowired
+    @Qualifier("importDataPesertaFromCsvJob")
     private Job importDataPesertaFromCsvJob;
+    
+    @Autowired
+    @Qualifier("exportPesertaJob")
+    private Job exportPesertaJob;
     
     Logger logger = LoggerFactory.getLogger(PesertaBatchJobController.class);
     
@@ -35,9 +41,23 @@ public class PesertaBatchJobController {
     public String runPesertaBatchJob(){
         try {
             JobParameters parameters = new JobParametersBuilder()
-                    .addString("JobId", "24")
+                    .addString("JobId", "30")
                     .toJobParameters();
             jobLauncher.run(importDataPesertaFromCsvJob, parameters);
+        } catch (Exception ex) {
+            logger.error("ERROR LAUNCH importDataPesertaFromCsvJob : ",ex.getMessage(),ex);
+            return "ERROR LAUNCH importDataPesertaFromCsvJob : "+ex.getMessage();
+        } 
+        return "JOB DONE !!";
+    }
+    
+    @GetMapping("/runExportPesertaJob")
+    public String runExportPesertaBatchJob(){
+        try {
+            JobParameters parameters = new JobParametersBuilder()
+                    .addString("JobId", "31")
+                    .toJobParameters();
+            jobLauncher.run(exportPesertaJob, parameters);
         } catch (Exception ex) {
             logger.error("ERROR LAUNCH importDataPesertaFromCsvJob : ",ex.getMessage(),ex);
             return "ERROR LAUNCH importDataPesertaFromCsvJob : "+ex.getMessage();
