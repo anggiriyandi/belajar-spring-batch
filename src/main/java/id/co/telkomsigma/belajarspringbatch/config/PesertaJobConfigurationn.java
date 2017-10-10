@@ -12,6 +12,8 @@ import id.co.telkomsigma.belajarspringbatch.listener.SkipCheckingListener;
 import id.co.telkomsigma.belajarspringbatch.mapper.PesertaMapper;
 import id.co.telkomsigma.belajarspringbatch.processor.PesertaItemProcessor;
 import id.co.telkomsigma.belajarspringbatch.tasklet.DeletePesertaCsvTasklet;
+import id.co.telkomsigma.belajarspringbatch.tasklet.SampleTasklet;
+import id.co.telkomsigma.belajarspringbatch.tasklet.SampleTasklet2;
 import id.co.telkomsigma.belajarspringbatch.writter.PesertaItemwritter;
 import java.sql.SQLDataException;
 import java.util.Date;
@@ -26,6 +28,8 @@ import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.job.builder.FlowBuilder;
+import org.springframework.batch.core.job.flow.Flow;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
@@ -39,6 +43,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.scheduling.annotation.Scheduled;
 
 /**
@@ -76,6 +81,12 @@ public class PesertaJobConfigurationn {
     @Autowired
     public JobLauncher launcher;
     
+    @Autowired
+    public SampleTasklet sampleTasklet;
+    
+    @Autowired
+    public SampleTasklet2 sampleTasklet2;
+    
     Logger logger = LoggerFactory.getLogger(PesertaJobConfigurationn.class);
     
     @Bean
@@ -104,7 +115,7 @@ public class PesertaJobConfigurationn {
     }
     
     
-    @Scheduled(cron = "*/10 * * * * *")
+//    @Scheduled(cron = "*/10 * * * * *")
     public void performJob(){
         try {
             logger.info("============= job berjalan pada {} ================",new Date());
@@ -119,10 +130,27 @@ public class PesertaJobConfigurationn {
     
     @Bean
     public Job importDataPesertaFromCsvJob(){
+        Flow splitFlow = new FlowBuilder<Flow>("subFlow")
+                .from(step3()).build();
+        
+        Flow splitFlow2 = new FlowBuilder<Flow>("subFlow2")
+                .from(step4()).build();
+        
+        
         return jobBuilderFactory.get("importDataPesertaFromCsvJob")
                 .incrementer(new RunIdIncrementer())
+                
+//              sequential step
+//                .flow(step1())
+//                    .next(step2())
+                
+                //conditional step
+//                .flow(step1())
+//                    .on("COMPLETED WITH ERROR").to(step3()).next(step2())
+//                    .from(step1()).on("*").end()
+//                paralel flow
                 .flow(step1())
-                    .next(step2())
+                .split(new SimpleAsyncTaskExecutor()).add(splitFlow,splitFlow2)
                 .end()
                 .build();
     }
@@ -150,6 +178,20 @@ public class PesertaJobConfigurationn {
     public Step step2(){
         return stepBuilderFactory.get("step2")
                 .tasklet(tasklet)
+                .build();
+    }
+    
+    @Bean
+    public Step step3(){
+        return stepBuilderFactory.get("step3")
+                .tasklet(sampleTasklet)
+                .build();
+    }
+    
+    @Bean
+    public Step step4(){
+        return stepBuilderFactory.get("step4")
+                .tasklet(sampleTasklet2)
                 .build();
     }
 }
