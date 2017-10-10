@@ -14,11 +14,23 @@ import id.co.telkomsigma.belajarspringbatch.processor.PesertaItemProcessor;
 import id.co.telkomsigma.belajarspringbatch.tasklet.DeletePesertaCsvTasklet;
 import id.co.telkomsigma.belajarspringbatch.writter.PesertaItemwritter;
 import java.sql.SQLDataException;
+import java.util.Date;
+import java.util.logging.Level;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.JobParametersInvalidException;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
+import org.springframework.batch.core.repository.JobExecutionAlreadyRunningException;
+import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteException;
+import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileParseException;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -27,6 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  *
@@ -60,6 +73,11 @@ public class PesertaJobConfigurationn {
     @Autowired
     public CustomSkipListener skipListener;
     
+    @Autowired
+    public JobLauncher launcher;
+    
+    Logger logger = LoggerFactory.getLogger(PesertaJobConfigurationn.class);
+    
     @Bean
     public FlatFileItemReader<Peserta> reader(){
         FlatFileItemReader<Peserta> reader = 
@@ -83,6 +101,20 @@ public class PesertaJobConfigurationn {
 //        reader.setLineMapper(defaultLineMapper);
         
         return reader;
+    }
+    
+    
+    @Scheduled(cron = "*/10 * * * * *")
+    public void performJob(){
+        try {
+            logger.info("============= job berjalan pada {} ================",new Date());
+            JobParameters param = new JobParametersBuilder()
+                    .addString("JobId", String.valueOf(System.currentTimeMillis()))
+                    .toJobParameters();
+            JobExecution execution = launcher.run(importDataPesertaFromCsvJob(), param);
+        } catch (Exception ex) {
+            logger.error("CANNOT LAUNCH JOB SCHEDULER : {}",ex.getMessage(),ex);
+        }
     }
     
     @Bean
