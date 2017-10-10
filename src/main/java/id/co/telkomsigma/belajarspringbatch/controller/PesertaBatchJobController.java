@@ -35,7 +35,7 @@ public class PesertaBatchJobController {
     public String runPesertaBatchJob(){
         try {
             JobParameters parameters = new JobParametersBuilder()
-                    .addString("JobId", "7")
+                    .addString("JobId", "2")
                     .toJobParameters();
             jobLauncher.run(importDataPesertaFromCsvJob, parameters);
         } catch (Exception ex) {

@@ -6,6 +6,7 @@
 package id.co.telkomsigma.belajarspringbatch.config;
 
 import id.co.telkomsigma.belajarspringbatch.domain.Peserta;
+import id.co.telkomsigma.belajarspringbatch.listener.SkipCheckingListener;
 import id.co.telkomsigma.belajarspringbatch.mapper.PesertaMapper;
 import id.co.telkomsigma.belajarspringbatch.processor.PesertaItemProcessor;
 import id.co.telkomsigma.belajarspringbatch.tasklet.DeletePesertaCsvTasklet;
@@ -47,6 +48,9 @@ public class PesertaJobConfigurationn {
     @Autowired
     public DeletePesertaCsvTasklet tasklet;
     
+    @Autowired
+    public SkipCheckingListener skipCheckingListener;
+    
             
     @Bean
     public FlatFileItemReader<Peserta> reader(){
@@ -86,13 +90,14 @@ public class PesertaJobConfigurationn {
     @Bean
     public Step step1(){
         return stepBuilderFactory.get("step1")
-                .<Peserta,Peserta> chunk(1)
+                .<Peserta,Peserta> chunk(2)
                 .reader(reader())
                 .processor(processor)
                 .writer(itemwritter)
                     .faultTolerant()
                     .skip(FlatFileParseException.class)
                     .skipLimit(1)
+                .listener(skipCheckingListener)
                 .build();
     } 
     
