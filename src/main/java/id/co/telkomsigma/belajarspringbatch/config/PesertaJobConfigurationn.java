@@ -13,6 +13,7 @@ import id.co.telkomsigma.belajarspringbatch.mapper.PesertaMapper;
 import id.co.telkomsigma.belajarspringbatch.processor.PesertaItemProcessor;
 import id.co.telkomsigma.belajarspringbatch.tasklet.DeletePesertaCsvTasklet;
 import id.co.telkomsigma.belajarspringbatch.writter.PesertaItemwritter;
+import java.sql.SQLDataException;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -97,13 +98,16 @@ public class PesertaJobConfigurationn {
     @Bean
     public Step step1(){
         return stepBuilderFactory.get("step1")
-                .<Peserta,Peserta> chunk(2)
+                .<Peserta,Peserta> chunk(1)
                 .reader(reader())
                 .processor(processor)
                 .writer(itemwritter)
                     .faultTolerant()
                     .skip(FlatFileParseException.class)
-                    .skipLimit(1)
+                    .skip(SQLDataException.class)
+                    .skipLimit(2)
+                    .retry(SQLDataException.class)
+                    .retryLimit(3)
                 .listener(skipCheckingListener)
                 .listener(readerListener)
                 .listener(skipListener)

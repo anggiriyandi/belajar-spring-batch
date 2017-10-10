@@ -63,4 +63,9 @@ public class Peserta {
     public void setTanggalLahir(Date tanggalLahir) {
         this.tanggalLahir = tanggalLahir;
     }
+
+    @Override
+    public String toString() {
+        return "Peserta{" + "id=" + id + ", nama=" + nama + ", alamat=" + alamat + ", tanggalLahir=" + tanggalLahir + '}';
+    }
 }

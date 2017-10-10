@@ -7,6 +7,7 @@ package id.co.telkomsigma.belajarspringbatch.writter;
 
 import id.co.telkomsigma.belajarspringbatch.dao.PesertaDao;
 import id.co.telkomsigma.belajarspringbatch.domain.Peserta;
+import java.sql.SQLDataException;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,11 @@ public class PesertaItemwritter implements ItemWriter<Peserta>{
     @Override
     public void write(List<? extends Peserta> list) throws Exception {
         for (Peserta peserta : list) {
+            
+            if(peserta.getNama().equalsIgnoreCase("Ari")){
+                throw new SQLDataException("SENGAJA DIBUAT ERROR KETIKA SAVE !!");
+            }
+            
             logger.info("PESERTA YANG AKAN DI SAVE : {}",peserta.getNama());
             pesertaDao.save(peserta);
               

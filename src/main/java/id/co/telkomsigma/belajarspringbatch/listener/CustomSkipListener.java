@@ -30,7 +30,7 @@ public class CustomSkipListener {
     
     @OnSkipInWrite
     public void onSkipWrite(Peserta p, Throwable t){
-        logger.error("OBJECT YANG ERROR KETIKA DI SAVE : {}",p);
+        logger.error("OBJECT YANG ERROR KETIKA DI SAVE : {}", p);
     }
     
     @OnSkipInProcess
