@@ -135,7 +135,18 @@ public class PesertaJobConfigurationn {
         
         Flow splitFlow2 = new FlowBuilder<Flow>("subFlow2")
                 .from(step4()).build();
-        
+//        
+//        Flow paralelFlow = new FlowBuilder<Flow>("paralelFlow")
+//                .start(step1())
+//                .split(new SimpleAsyncTaskExecutor())
+//                .add(splitFlow2)
+//                .build();
+//        
+//        Flow paralelFlow2 = new FlowBuilder<Flow>("paralelFlow2")
+//                .start(paralelFlow)
+//                .next(splitFlow)
+//                .next(splitFlow2)
+//                .build();
         
         return jobBuilderFactory.get("importDataPesertaFromCsvJob")
                 .incrementer(new RunIdIncrementer())
